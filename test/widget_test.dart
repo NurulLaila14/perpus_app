@@ -8,23 +8,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:perpus_app/main.dart';
+import 'package:perpus_app/core/routes/app_router.dart';
+import 'package:perpus_app/models/book_model.dart';
+import 'package:perpus_app/views/books/book_detail_view.dart';
+import 'package:perpus_app/widgets/book_card.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const PerpusApp());
+  testWidgets('opens the selected book details', (WidgetTester tester) async {
+    const book = BookModel(
+      id: 1,
+      title: 'Flutter Dasar',
+      author: 'A. Penulis',
+      publisher: 'Penerbit',
+      isbn: '9781234567890',
+      publishedYear: 2025,
+      stock: 3,
+      description: 'Buku pengantar Flutter.',
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: BookCard(book: book, onEdit: () {}, onDelete: () {}),
+        ),
+        routes: {AppRoutes.bookDetail: (_) => const BookDetailView(book: book)},
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.tap(find.text('Flutter Dasar'));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Detail Buku'), findsOneWidget);
+    expect(find.text('9781234567890'), findsOneWidget);
+    expect(find.text('Buku pengantar Flutter.'), findsOneWidget);
   });
 }

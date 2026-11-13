@@ -26,7 +26,10 @@ class AuthRepository {
     return _saveSession(res.data as Map<String, dynamic>);
   }
 
-  Future<UserModel> login({required String email, required String password}) async {
+  Future<UserModel> login({
+    required String email,
+    required String password,
+  }) async {
     final res = await _api.post(ApiConstants.login, {
       'email': email,
       'password': password,
@@ -49,6 +52,11 @@ class AuthRepository {
       }
       rethrow;
     }
+  }
+
+  Future<UserModel> getProfile() async {
+    final res = await _api.get(ApiConstants.me);
+    return UserModel.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
   /// Token lokal selalu dihapus, walaupun request ke server gagal (mis. offline).

@@ -1,5 +1,7 @@
 // lib/widgets/book_card.dart
 import 'package:flutter/material.dart';
+
+import '../core/routes/app_router.dart';
 import '../models/book_model.dart';
 
 class BookCard extends StatelessWidget {
@@ -20,11 +22,28 @@ class BookCard extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(child: Text(book.id.toString())),
         title: Text(book.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text('${book.author} · ${book.publishedYear} · Stok: ${book.stock}'),
+        subtitle: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(text: '${book.author} · ${book.publishedYear} · '),
+              TextSpan(
+                text: _stockLabel(book.stock),
+                style: TextStyle(
+                  color: _stockColor(book.stock),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(icon: const Icon(Icons.edit), onPressed: onEdit, tooltip: 'Edit'),
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: onEdit,
+              tooltip: 'Edit',
+            ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: onDelete,
@@ -32,33 +51,18 @@ class BookCard extends StatelessWidget {
             ),
           ],
         ),
-        onTap: () => _showDetail(context),
-      ),
-    );
-  }
-
-  void _showDetail(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(book.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Penulis: ${book.author}'),
-            if (book.publisher != null) Text('Penerbit: ${book.publisher}'),
-            Text('ISBN: ${book.isbn}'),
-            Text('Tahun: ${book.publishedYear}'),
-            Text('Stok: ${book.stock}'),
-            if (book.description != null) ...[
-              const Divider(),
-              Text(book.description!),
-            ],
-          ],
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Tutup'))],
+        onTap: () =>
+            Navigator.pushNamed(context, AppRoutes.bookDetail, arguments: book),
       ),
     );
   }
 }
+
+Color _stockColor(int stock) {
+  if (stock == 0) return Colors.red;
+  if (stock <= 5) return Colors.orange;
+  return Colors.green;
+}
+
+String _stockLabel(int stock) =>
+    stock == 0 ? 'Stok: 0 (Habis)' : 'Stok: $stock';

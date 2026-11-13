@@ -1,6 +1,7 @@
 // lib/views/books/books_view.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/routes/app_router.dart';
 import '../../models/book_model.dart';
 import '../../viewmodels/auth_vm.dart';
@@ -49,10 +50,12 @@ class _BooksViewState extends ConsumerState<BooksView> {
     if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(msg),
-        backgroundColor: isError ? Theme.of(context).colorScheme.error : null,
-      ));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: isError ? Theme.of(context).colorScheme.error : null,
+        ),
+      );
   }
 
   Future<void> _openForm([BookModel? book]) async {
@@ -136,16 +139,23 @@ class _BooksViewState extends ConsumerState<BooksView> {
               children: [
                 const SizedBox(height: 120),
                 Center(
-                  child: Text(state.search.isEmpty
-                      ? 'Belum ada buku.'
-                      : 'Tidak ada buku untuk "${state.search}".'),
+                  child: Text(
+                    state.search.isEmpty
+                        ? 'Belum ada buku.'
+                        : 'Tidak ada buku untuk "${state.search}".',
+                  ),
                 ),
               ],
             )
           : ListView.separated(
               controller: _scrollCtrl,
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 96), // ruang untuk FAB
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                8,
+                16,
+                96,
+              ), // ruang untuk FAB
               itemCount: state.books.length + 1,
               separatorBuilder: (_, _) => const SizedBox(height: 4),
               itemBuilder: (ctx, i) {
@@ -171,14 +181,19 @@ class _BooksViewState extends ConsumerState<BooksView> {
     }
     if (state.hasMore) {
       return Center(
-        child: TextButton(onPressed: _loadMore, child: const Text('Muat lebih banyak')),
+        child: TextButton(
+          onPressed: _loadMore,
+          child: const Text('Muat lebih banyak'),
+        ),
       );
     }
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Center(
-        child: Text('${state.books.length} dari ${state.total} buku',
-            style: Theme.of(context).textTheme.bodySmall),
+        child: Text(
+          '${state.books.length} dari ${state.total} buku',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
     );
   }
@@ -188,7 +203,9 @@ class _BooksViewState extends ConsumerState<BooksView> {
     final state = ref.watch(bookProvider);
     // Jika daftar sudah tampil lalu muat ulang gagal, cukup tampilkan snackbar.
     ref.listen(bookProvider.select((s) => s.error), (_, next) {
-      if (next != null && ref.read(bookProvider).books.isNotEmpty) _toast(next, isError: true);
+      if (next != null && ref.read(bookProvider).books.isNotEmpty) {
+        _toast(next, isError: true);
+      }
     });
     final userName = ref.watch(authProvider.select((s) => s.user?.name)) ?? '';
 
@@ -202,11 +219,20 @@ class _BooksViewState extends ConsumerState<BooksView> {
           : null,
       actions: [
         IconButton(
+          icon: const Icon(Icons.person_outline),
+          tooltip: 'Profil',
+          onPressed: () => Navigator.pushNamed(context, AppRoutes.profile),
+        ),
+        IconButton(
           icon: const Icon(Icons.refresh),
           tooltip: 'Muat ulang',
           onPressed: state.loading ? null : () => _vm.load(),
         ),
-        IconButton(icon: const Icon(Icons.logout), tooltip: 'Logout', onPressed: _logout),
+        IconButton(
+          icon: const Icon(Icons.logout),
+          tooltip: 'Logout',
+          onPressed: _logout,
+        ),
       ],
     );
 
@@ -238,11 +264,18 @@ class _BooksViewState extends ConsumerState<BooksView> {
 
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [searchBar, Expanded(child: _body(state))],
+      children: [
+        searchBar,
+        Expanded(child: _body(state)),
+      ],
     );
 
     return ResponsiveLayout(
-      mobile: Scaffold(appBar: appBar, body: content, floatingActionButton: fab),
+      mobile: Scaffold(
+        appBar: appBar,
+        body: content,
+        floatingActionButton: fab,
+      ),
       desktop: Scaffold(
         appBar: appBar,
         body: Row(
@@ -261,16 +294,23 @@ class _BooksViewState extends ConsumerState<BooksView> {
                 child: Column(
                   children: [
                     CircleAvatar(
-                      child: Text(userName.isEmpty ? '?' : userName[0].toUpperCase()),
+                      child: Text(
+                        userName.isEmpty ? '?' : userName[0].toUpperCase(),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     SizedBox(
                       width: 72,
-                      child: Text(userName,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        userName,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
